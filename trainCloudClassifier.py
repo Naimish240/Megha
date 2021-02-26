@@ -33,6 +33,7 @@ for category in CATEGORIES:
         img_arr = cv2.imread(os.path.join(path, image), cv2.IMREAD_GRAYSCALE)
         # Insert into the dataset
         dataset.append([img_arr, img_cat])
+print("Loaded dataset")
 # --------------------------------------------
 random.shuffle(dataset)
 # --------------------------------------------
@@ -57,6 +58,7 @@ augmentable_count = {
 aug_data = []
 index_errors = 0
 # --------------------------------------------
+print("Augmenting Dataset")
 # Augments the images
 for img_arr, img_cat in dataset:
     try:
@@ -90,6 +92,7 @@ for img_arr, img_cat in dataset:
         plt.imshow(img_arr, cmap='gray')
         plt.show()
         print('---------------------------')
+print("Dataset Augmented")
 # --------------------------------------------
 reshaped_data = []
 # --------------------------------------------
@@ -98,6 +101,7 @@ for img_arr, cat_arr in dataset:
     new_img = cv2.resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
     reshaped_data.append([new_img, img_cat])
 # --------------------------------------------
+print("Datasets Merged")
 # Join Original and Augmented together
 training_data = reshaped_data + aug_data
 print(len(training_data))
@@ -112,6 +116,7 @@ for features, label in training_data:
     y.append(foo)
 # --------------------------------------------
 X = np.array(X).reshape(-1, NEW_IMG_SIZE, NEW_IMG_SIZE, 1)
+print("Dataset converted to Numpy array")
 # --------------------------------------------
 # Create the Model
 num_classes = 11
@@ -207,11 +212,15 @@ model.add(layers.Dense(11, 'softmax'))
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
+
+print("Model compiled")
+print(model.summary())
 # --------------------------------------------
 Z = []
 for i in X:
     Z.append(tf.convert_to_tensor(i, dtype=tf.float32))
 X = Z
+print("Numpy to tensor converted")
 # --------------------------------------------
 # Train
 epochs = 5
