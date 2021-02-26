@@ -10,7 +10,7 @@ from tensorflow.keras import layers
 # --------------------------------------------
 random.seed(69)  # Because reproducibility matters
 # --------------------------------------------
-DATASET = "/home/cached/theCode/JupyterNotebooks/Clouds/Clouds"
+DATASET = "/home/cached/theCode/JupyterNotebooks/Clouds/Clouds/Dataset"
 CATEGORIES = ["Ci", "Cs", "Cc", "Ac", "As", "Cu", "Cb", "Ns", "Sc", "St", "Ct"]
 # Ci Cs Cc Ac As Cu Cb Ns Sc St Ct
 # --------------------------------------------
