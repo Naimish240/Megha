@@ -24,7 +24,7 @@ class CNN(object):
         # Add preprocessing layer to convert from [0:255] to [0:1]
         self.model.add(layers.experimental.preprocessing.Rescaling(
             1./255, 
-            input_shape=(X.shape[1:])
+            input_shape=(256,)
                 ))
 
         # Add First Conv Layer, from Alex
