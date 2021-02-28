@@ -1,3 +1,4 @@
+import numpy as np
 from os import listdir, mkdir
 from os.path import join, exists
 from cv2 import imread, imwrite, IMREAD_GRAYSCALE, resize
@@ -134,7 +135,7 @@ def resizeOriginalImages(dataset, NEW_IMG_SIZE):
     """
     reshaped_data = []
     # Convert images in Original into 256*256
-    for img_arr, cat_arr in dataset:
+    for img_arr, img_cat in dataset:
         new_img = resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
         reshaped_data.append([new_img, img_cat])
     return reshaped_data
@@ -149,9 +150,17 @@ def saveImages(dataset, folder):
     """
     # Index, to make writing filenames easier
     index = 0
-    for img, cat in dataset:
+    print(dataset[0][0])
+    print(dataset[0][1])
+    #for img, cat in dataset:
+    for i in range(len(dataset)):
+        img = np.array(dataset[i][0])
+        cat = dataset[i][1]
+        # Checks if the folder exists, and then creates it if it doesn't
+        if not exists("{}".format(folder)):
+            mkdir("{}".format(folder))
         # Checks if the folder exists, and creates it if it doesn;t
-        if not exsist("{}/{}".format(folder, cat)):
+        if not exists("{}/{}".format(folder, cat)):
             mkdir("{}/{}".format(folder, cat))
         # Writes image into folder
         path = "{}/{}/{}.jpg".format(folder, cat, index)
@@ -183,8 +192,8 @@ def loadProcessedImages(folder):
 if __name__ == '__main__':
     # Set-up parser
     parser = ArgumentParser("Preprocess the data")
-    parser.add_argument('datasetPath', type=str, help="Path to folder which stores the dataset", required=True)
-    parser.add_argument('savePath', type=str, help="Name of folder to save processed images to", required=True)
+    parser.add_argument('datasetPath', type=str, help="Path to folder which stores the dataset")
+    parser.add_argument('savePath', type=str, help="Name of folder to save processed images to")
     # Parse args
     args = parser.parse_args()
     # Get values
