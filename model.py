@@ -199,21 +199,6 @@ class CNN(object):
         # Run prediction, after training
         return self.model.predict(x)
 
-    def export(self, path):
-        """
-        Function to convert model from tf to tflite
-
-        Args:
-            path (str): Path to the SavedModel, for conversion
-        """
-        # Convert model to tflite
-        converter = tf.lite.TFLiteConverter.from_saved_model("{}".format(path))
-        tflite_model = converter.convert()
-
-        # Save the model
-        with open('Clouds.tflite', 'wb') as f:
-            f.write(tflite_model)
-
     def summary(self):
         """
         Generate summary for the model

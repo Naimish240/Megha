@@ -30,6 +30,7 @@ def main(folder, epochs, batch_size, val_frc):
             y_train.append(x)
     # Create Model
     model = CNN(epochs, batch_size)
+    model.createCNN()
     # Compile model
     model.compile()
     # Print model summary
