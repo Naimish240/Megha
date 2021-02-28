@@ -26,7 +26,7 @@ def main(folder, epochs, batch_size, val_frc, chkpts):
         # Get values from dataset
         x, y = dataset[i]
         # Yeet into validation
-        if i < val_frc:
+        if i < len(dataset)*(val_frc):
             # Normalizing here, instead of in layer due to bugs
             x = x / 255.0
             x_val.append(x)
