@@ -27,10 +27,14 @@ def main(folder, epochs, batch_size, val_frc, chkpts):
         x, y = dataset[i]
         # Yeet into validation
         if i < val_frc:
+            # Normalizing here, instead of in layer due to bugs
+            x = x / 255.0
             x_val.append(x)
             y_val.append(y)
         # Add to train
         else:
+            # Normalizing here, instead of in layer due to error issues
+            x = x / 255.0
             x_train.append(x)
             y_train.append(x)
     print("Dataset split into training and testing")
