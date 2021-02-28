@@ -150,8 +150,8 @@ def saveImages(dataset, folder):
     """
     # Index, to make writing filenames easier
     index = 0
-    print(dataset[0][0])
-    print(dataset[0][1])
+    #print(dataset[0][0])
+    #print(dataset[0][1])
     #for img, cat in dataset:
     for i in range(len(dataset)):
         img = np.array(dataset[i][0])
