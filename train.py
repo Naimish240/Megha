@@ -5,6 +5,8 @@ import numpy as np
 from model import CNN
 from preprocessing import loadProcessedImages
 
+# NOTE : Run "export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1" on Jetson Nano to prevent errors
+
 def main(folder, epochs, batch_size, val_frc, chkpts):
     # Initialize the arrays
     x_train = []
@@ -53,7 +55,7 @@ if __name__ == '__main__':
 
     FOLDER = args.folder
     EPOCHS = args.epochs
-    BATCH_SIZE = args.batch_size
+    BATCH_SIZE = args.batchS
     VAL_FRAC = args.valfrc
     CHK_PTS = args.chkpts
 
