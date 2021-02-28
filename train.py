@@ -1,4 +1,5 @@
 import os
+import pickle
 import random
 import argparse
 import numpy as np
@@ -7,7 +8,7 @@ from preprocessing import loadProcessedImages
 
 # NOTE : Run "export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1" on Jetson Nano to prevent errors
 
-def main(folder, epochs, batch_size, val_frc, chkpts):
+def beforeTraining(folder, val_frc):
     # Initialize the arrays
     x_train = []
     y_train = []
@@ -40,6 +41,22 @@ def main(folder, epochs, batch_size, val_frc, chkpts):
     print("Dataset split into training and testing")
     print("Samples in training set   : ", len(y_train))
     print("Samples in validation set : ", len(y_val))
+
+    pickle.dump(x_train, open( "Pickles/x_train.p", "wb" ))
+    pickle.dump(y_train, open( "Pickles/y_train.p", "wb" ))
+    pickle.dump(x_val, open( "Pickles/x_val.p", "wb" ))
+    pickle.dump(y_val, open( "Pickles/y_val.p", "wb" ))
+
+def main(folder, epochs, batch_size, val_frc, chkpts):
+    # Run if first time, else read directly from pkl
+    beforeTraining(folder, val_frc)
+
+    # Load values from pkl file
+    x_train = pickle.load(open( "Pickles/x_train.p", "rb" ))
+    y_train = pickle.load(open( "Pickles/y_train.p", "rb" ))
+    x_val = pickle.load(open( "Pickles/x_val.p", "rb" ))
+    y_val = pickle.load(open( "Pickles/y_val.p", "rb" ))
+    
     # Create Model
     model = CNN(epochs, batch_size)
     model.createCNN()
