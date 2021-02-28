@@ -1,10 +1,11 @@
+import os
 import random
 import argparse
 import numpy as np
 from model import CNN
 from preprocessing import loadProcessedImages
 
-def main(folder, epochs, batch_size, val_frc):
+def main(folder, epochs, batch_size, val_frc, chkpts):
     # Initialize the arrays
     x_train = []
     y_train = []
@@ -36,22 +37,28 @@ def main(folder, epochs, batch_size, val_frc):
     # Print model summary
     model.summary()
     # Train the model
-    model.train(x_train, y_train, x_val, y_val)
+    model.train(x_train, y_train, x_val, y_val, chkpts)
     # Show Model Analysis
     model.analyse()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('folder', type=str, help="Folder to load data from", required=True)
-    parser.add_argument('epochs', type=int, help="Number of epochs to train for", required=True)
-    parser.add_argument('batchS', type=int, help="Batch Size", required=True)
-    parser.add_argument('valfrc', type=float, help="Validation fraction", required=True)
+    parser.add_argument('folder', type=str, help="Folder to load data from")
+    parser.add_argument('epochs', type=int, help="Number of epochs to train for")
+    parser.add_argument('batchS', type=int, help="Batch Size")
+    parser.add_argument('valfrc', type=float, help="Validation fraction")
+    parser.add_argument('chkpts', type=str, help="Checkpoint folder")
     args = parser.parse_args()
 
     FOLDER = args.folder
     EPOCHS = args.epochs
     BATCH_SIZE = args.batch_size
     VAL_FRAC = args.valfrc
-    main(FOLDER, EPOCHS, BATCH_SIZE, VAL_FRAC)
+    CHK_PTS = args.chkpts
+
+    if not os.path.exists("{}".format(CHK_PTS)):
+        os.mkdir("{}".format(CHK_PTS))
+
+    main(FOLDER, EPOCHS, BATCH_SIZE, VAL_FRAC, CHK_PTS)
     

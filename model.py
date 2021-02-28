@@ -131,7 +131,7 @@ class CNN(object):
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
-        self.history = model.fit(
+        self.history = self.model.fit(
             x_train, 
             y_train, 
             batch_size=self.batch_size, 
@@ -150,7 +150,7 @@ class CNN(object):
         loss = self.history.history['loss']
         val_loss = self.history.history['val_loss']
 
-        epochs_range = range(epochs)
+        epochs_range = range(self.epochs)
 
         plt.figure(figsize=(8, 8))
         plt.subplot(1, 2, 1)
