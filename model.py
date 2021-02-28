@@ -21,11 +21,18 @@ class CNN(object):
         """
         Creates the Model, in all it's glory
         """
+        # Commented out preprocessing layer because it caused issues. Resized array in train.py instead.
+        '''
         # Add preprocessing layer to convert from [0:255] to [0:1]
         self.model.add(layers.experimental.preprocessing.Rescaling(
             1./255, 
             input_shape=(256,256,1)
                 ))
+        '''
+        # Added Input Layer
+        tf.keras.layers.InputLayer(
+            input_shape=(256,256,1)
+        )
 
         # Add First Conv Layer, from Alex
         # 256*256*1 to 63*63*64

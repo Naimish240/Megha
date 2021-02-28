@@ -17,8 +17,10 @@ def main(folder, epochs, batch_size, val_frc, chkpts):
     random.seed(69)
     # Load Dataset
     dataset = loadProcessedImages(folder)
+    print("Dataset Loaded")
     # Shuffle the dataset around, to avoid training "accidents"
     random.shuffle(dataset)
+    print("Dataset Shuffled")
     # Split dataset into X and Y
     for i in range(len(dataset)):
         # Get values from dataset
@@ -31,14 +33,20 @@ def main(folder, epochs, batch_size, val_frc, chkpts):
         else:
             x_train.append(x)
             y_train.append(x)
+    print("Dataset split into training and testing")
+    print("Samples in training set   : ", len(y_train))
+    print("Samples in validation set : ", len(y_val))
     # Create Model
     model = CNN(epochs, batch_size)
     model.createCNN()
+    print("Model Created")
     # Compile model
     model.compile()
+    print("Model Compiled")
     # Print model summary
     model.summary()
     # Train the model
+    print("Training Started")
     model.train(x_train, y_train, x_val, y_val, chkpts)
     # Show Model Analysis
     model.analyse()
