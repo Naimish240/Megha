@@ -4,9 +4,10 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 class CNN(object):
-    def __init__(self, epochs):
+    def __init__(self, epochs, batchSize):
         self.epochs=epochs
         self.history = None
+        self.batch_size = batchSize
         self.model = keras.Sequential()
 
         # Add preprocessing layer to convert from [0:255] to [0:1]
@@ -101,11 +102,11 @@ class CNN(object):
             metrics=['accuracy']
             )
 
-    def train(self):
+    def train(self, x_train, y_train, x_val, y_val):
         self.history = model.fit(
             x_train, 
             y_train, 
-            batch_size=16, 
+            batch_size=self.batch_size, 
             epochs=self.epochs,
             validation_data=(x_val, y_val))
 
@@ -134,3 +135,6 @@ class CNN(object):
 
     def summary(self):
         self.model.summary()
+
+if __name__ == "__main__":
+    print("Error! Import-only script!")

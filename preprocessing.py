@@ -1,7 +1,9 @@
-import os
-import cv2
-import random
-import matplotlib.pyplot as plt
+from os import listdir, mkdir
+from os.path import join, exists
+from cv2 import imread, imwrite, IMREAD_GRAYSCALE, resize
+from random import random, randint, seed
+from argparse import ArgumentParser
+from matplotlib.pyplot import imshow, show
 
 augmentable_count = {
     0  : 211,
@@ -53,11 +55,11 @@ def loadRawData(CATEGORIES, DATASET):
     """
     dataset = []
     for category in CATEGORIES:
-        path = os.path.join(DATASET, category)
+        path = join(DATASET, category)
         img_cat = CATEGORIES.index(category)
-        for image in os.listdir(path):
+        for image in listdir(path):
             # Load image in B/W
-            img_arr = cv2.imread(os.path.join(path, image), cv2.IMREAD_GRAYSCALE)
+            img_arr = imread(join(path, image), IMREAD_GRAYSCALE)
             # Insert into the dataset
             dataset.append([img_arr, img_cat])
     return dataset
@@ -79,7 +81,8 @@ def augmentImages(dataset, OLD_IMG_SIZE, NEW_IMG_SIZE):
     global augmentable_count
     aug_data = []
     index_errors = 0
-    # Augments the images
+    # Augments the images with seed, for reproducability
+    seed(69)
     for img_arr, img_cat in dataset:
         try:
             if augmentable_count[img_cat] > 0:
@@ -87,17 +90,17 @@ def augmentImages(dataset, OLD_IMG_SIZE, NEW_IMG_SIZE):
                 augmentable_count[img_cat] -= 1
 
                 # Random number to figure out where we'll be cropping from or shrinking
-                p = random.random()
+                p = random()
                 try:
                     # Shrink Image (20%, since 5 cases)
                     if p < (1/5):
-                        new_img = cv2.resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
+                        new_img = resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
                         aug_data.append([new_img, img_cat])
 
                     # Crop from top (80 %, since it accounts for L and R (both top and bottom))
                     else:
-                        x = random.randint(0, OLD_IMG_SIZE-NEW_IMG_SIZE)
-                        y = random.randint(0, OLD_IMG_SIZE-NEW_IMG_SIZE)
+                        x = randint(0, OLD_IMG_SIZE-NEW_IMG_SIZE)
+                        y = randint(0, OLD_IMG_SIZE-NEW_IMG_SIZE)
                         new_img = cropImg(x, y, img_arr, NEW_IMG_SIZE)
                         aug_data.append([new_img, img_cat])
                         
@@ -110,8 +113,8 @@ def augmentImages(dataset, OLD_IMG_SIZE, NEW_IMG_SIZE):
             print("Key Error")
             print(augmentable_count)
             print(img_cat)
-            plt.imshow(img_arr, cmap='gray')
-            plt.show()
+            imshow(img_arr, cmap='gray') # MatPlotLib
+            show()
             print('---------------------------')
     
     return aug_data
@@ -132,7 +135,7 @@ def resizeOriginalImages(dataset, NEW_IMG_SIZE):
     reshaped_data = []
     # Convert images in Original into 256*256
     for img_arr, cat_arr in dataset:
-        new_img = cv2.resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
+        new_img = resize(img_arr, (NEW_IMG_SIZE, NEW_IMG_SIZE))
         reshaped_data.append([new_img, img_cat])
     return reshaped_data
 
@@ -148,11 +151,11 @@ def saveImages(dataset, folder):
     index = 0
     for img, cat in dataset:
         # Checks if the folder exists, and creates it if it doesn;t
-        if not os.path.exsist("{}/{}".format(folder, cat)):
-            os.mkdir("{}/{}".format(folder, cat))
+        if not exsist("{}/{}".format(folder, cat)):
+            mkdir("{}/{}".format(folder, cat))
         # Writes image into folder
         path = "{}/{}/{}.jpg".format(folder, cat, index)
-        cv2.imwrite(path, img)
+        imwrite(path, img)
         # Increase index, for obv reasons
         index += 1
 
@@ -163,22 +166,51 @@ def loadProcessedImages(folder):
         folder (str): path to the augmented data folder
 
     Returns:
-        X : List of all images (input vector)
-        Y : List of all output vectors
+        dataset : List of all images (input vector) and categories (output vector)
     """
-    # Lists for Input and Output
-    X = []
-    Y = []
+    dataset = []
     # Loops through the processed images
     for i in range(11):
         path = "{}/{}".format(folder, i)
-        for filename in os.listdir(path):
-            img = cv2.imread(os.path.join(path, filename))
-            # Add input image to X
-            X.append(img)
+        for filename in listdir(path):
+            img = imread(join(path, filename))
             vec = [0] * 11
             vec[i] = 1
-            # Add Output Vector to Y
-            Y.append(vec)
+            dataset.append([img, vec])
+    # Returns dataset
+    return dataset
 
-    return X, Y
+if __name__ == '__main__':
+    # Set-up parser
+    parser = ArgumentParser("Preprocess the data")
+    parser.add_argument('datasetPath', type=str, help="Path to folder which stores the dataset", required=True)
+    parser.add_argument('savePath', type=str, help="Name of folder to save processed images to", required=True)
+    # Parse args
+    args = parser.parse_args()
+    # Get values
+    DATASET = args.datasetPath
+    FOLDER = args.savePath
+    CATEGORIES = ["Ci", "Cs", "Cc", "Ac", "As", "Cu", "Cb", "Ns", "Sc", "St", "Ct"]
+
+    print("----------------------------------------------")
+    print("Dataset Path : ", DATASET)
+    print("Save Folder  : ", FOLDER)
+    print("Categories   : ", CATEGORIES)
+    print("----------------------------------------------")
+    # Steps:
+    # 1. Load dataset
+    rawData = loadRawData(CATEGORIES, DATASET)
+    print("Loaded Unprocessed Data")
+    # 2. Augment some images, from 400*400 to 256*256
+    augImgs = augmentImages(rawData, 400, 256)
+    print("Images Augmented")
+    # 3. Resize all old images to 256*256
+    resized = resizeOriginalImages(rawData, 256)
+    print("Original Images Resized")
+    # 4. Merge datasets
+    dataset = resized + augImgs
+    print("Merged Dataset Created")
+    # 5. Save Processed Images
+    saveImages(dataset, FOLDER)
+    print("Merged dataset saved in folder {}".format(FOLDER))
+    print("----------------------------------------------")
